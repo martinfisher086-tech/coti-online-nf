@@ -8,9 +8,39 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Minus, Plus, FileText, CreditCard } from "lucide-react";
-
+import { Trash2, Minus, Plus, FileText, CreditCard, Check } from "lucide-react";
 import { toast } from "sonner";
+
+function CheckoutStepper({ mode }: { mode: "idle" | "quote" | "buy" }) {
+  const steps = ["Carrito", "Datos", "Confirmación"];
+  const active = mode === "idle" ? 0 : 1;
+  return (
+    <div className="flex items-center gap-0 mb-8">
+      {steps.map((step, i) => (
+        <div key={step} className="flex items-center">
+          <div className="flex flex-col items-center">
+            <div
+              className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors
+                ${i < active ? "bg-primary text-primary-foreground" :
+                  i === active ? "bg-primary text-primary-foreground ring-4 ring-primary/20" :
+                  "bg-muted text-muted-foreground"}`}
+            >
+              {i < active ? <Check className="h-4 w-4" /> : i + 1}
+            </div>
+            <span className={`mt-1 text-[10px] font-medium whitespace-nowrap
+              ${i === active ? "text-primary" : "text-muted-foreground"}`}>
+              {step}
+            </span>
+          </div>
+          {i < steps.length - 1 && (
+            <div className={`h-px w-12 sm:w-20 mx-1 mb-4 transition-colors
+              ${i < active ? "bg-primary" : "bg-border"}`} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function CartPage() {
   const { items, removeItem, updateQty, clear, total } = useCart();
@@ -146,7 +176,8 @@ export default function CartPage() {
   return (
     <PublicLayout>
       <div className="container max-w-4xl py-8">
-        <h1 className="text-2xl font-bold mb-6">Carrito de Compras</h1>
+        <h1 className="text-2xl font-bold mb-2">Carrito de Compras</h1>
+        <CheckoutStepper mode={mode} />
         {items.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center text-muted-foreground">

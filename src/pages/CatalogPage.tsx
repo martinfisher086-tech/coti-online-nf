@@ -66,32 +66,48 @@ export default function CatalogPage() {
   return (
     <PublicLayout>
       {/* Hero */}
-      <section className="relative py-16 bg-primary overflow-hidden">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
+      <section className="relative overflow-hidden bg-primary" style={{ minHeight: "340px" }}>
+        {/* Background image with stronger overlay */}
+        <div
+          className="absolute inset-0 bg-cover bg-center scale-105"
           style={{ backgroundImage: `url(${heroBackground})` }}
         />
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black/55" />
-        
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
+
         {/* Content */}
-        <div className="container text-center relative z-10">
-          <h1 className="text-4xl font-bold text-primary-foreground mb-3">Materiales de Construcción</h1>
-          <p className="text-primary-foreground/80 text-lg mb-6">
-            Catálogo completo con los mejores precios para tu obra
-          </p>
-          <div className="flex justify-center gap-3">
-            <Link to="/carrito">
-              <Button variant="secondary" size="lg">
-                <ShoppingCart className="mr-2 h-5 w-5" /> Ver Carrito
-              </Button>
-            </Link>
-            <Link to="/buscar-cotizacion">
-              <Button variant="outline" size="lg" className="border-primary/30 text-primary hover:bg-primary/10 hover:text-primary">
-                Mis Cotizaciones <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+        <div className="container relative z-10 py-16 md:py-20">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-primary-foreground/60 mb-3">
+              Catálogo Online
+            </p>
+            <h1
+              className="text-5xl md:text-7xl font-heading font-extrabold uppercase leading-none tracking-tight text-white mb-4"
+              style={{ letterSpacing: "-0.01em" }}
+            >
+              Materiales<br />
+              <span className="text-primary" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.3)" }}>
+                de Obra
+              </span>
+            </h1>
+            <p className="text-primary-foreground/75 text-base md:text-lg mb-8 max-w-md">
+              Cotizá y comprá directamente desde el catálogo. Precios actualizados, stock en tiempo real.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link to="/carrito">
+                <Button variant="secondary" size="lg" className="font-semibold">
+                  <ShoppingCart className="mr-2 h-5 w-5" /> Ver Carrito
+                </Button>
+              </Link>
+              <Link to="/buscar-cotizacion">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-white/30 text-white hover:bg-white/10 hover:text-white font-semibold"
+                >
+                  Mis Cotizaciones <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
