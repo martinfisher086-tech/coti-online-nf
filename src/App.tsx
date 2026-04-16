@@ -13,6 +13,7 @@ import AdminPriceHistory from "./pages/AdminPriceHistory";
 import AdminQuotes from "./pages/AdminQuotes";
 import AdminSales from "./pages/AdminSales";
 import NotFound from "./pages/NotFound";
+import OrderConfirmedPage from "./pages/OrderConfirmedPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/" element={<CatalogPage />} />
           <Route path="/carrito" element={<CartPage />} />
           <Route path="/buscar-cotizacion" element={<SearchQuotePage />} />
+          <Route path="/confirmado/:type/:id" element={<OrderConfirmedPage />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/catalogo" element={<AdminCatalog />} />

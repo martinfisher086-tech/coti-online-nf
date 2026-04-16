@@ -6,19 +6,30 @@ import { supabase } from "@/lib/supabase";
 import { PublicLayout } from "@/components/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, Minus, Plus, FileText, CreditCard } from "lucide-react";
+
 import { toast } from "sonner";
 
 export default function CartPage() {
   const { items, removeItem, updateQty, clear, total } = useCart();
   const [mode, setMode] = useState<"idle" | "quote" | "buy">("idle");
   const [form, setForm] = useState({ nombre: "", email: "", telefono: "", direccion: "" });
+  const [errors, setErrors] = useState<Partial<typeof form>>({});
   const [medioPago, setMedioPago] = useState("transferencia");
   const [submitting, setSubmitting] = useState(false);
   const [cotizacionResult, setCotizacionResult] = useState<any>(null);
   const navigate = useNavigate();
+
+  const validate = () => {
+    const e: Partial<typeof form> = {};
+    if (!form.nombre.trim()) e.nombre = "El nombre es obligatorio";
+    if (!form.email.trim()) e.email = "El email es obligatorio";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Ingresá un email válido";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
 
   const handleField = (field: string, val: string) => setForm((f) => ({ ...f, [field]: val }));
 
@@ -39,7 +50,7 @@ export default function CartPage() {
   };
 
   const handleQuote = async () => {
-    if (!form.nombre || !form.email) return toast.error("Nombre y email son obligatorios");
+    if (!validate()) return;
     setSubmitting(true);
     try {
       const clienteId = await getOrCreateCliente();
@@ -54,20 +65,21 @@ export default function CartPage() {
         producto_id: i.producto_id,
         cantidad: i.cantidad,
         precio_unitario: i.precio_unitario,
+        subtotal: i.precio_unitario * i.cantidad,
       }));
       const { error: itemsErr } = await supabase.from("cotizacion_items").insert(cotItems);
       if (itemsErr) throw itemsErr;
-      setCotizacionResult({ ...cot, items: cotItems, cliente: form });
-      toast.success("Cotización creada exitosamente");
+      clear();
+      navigate(`/confirmado/cotizacion/${cot.id}`);
     } catch (e: any) {
-      toast.error(e.message || "Error al crear cotización");
+      toast.error("Error al crear la cotización. Intentá de nuevo.");
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleBuy = async () => {
-    if (!form.nombre || !form.email) return toast.error("Nombre y email son obligatorios");
+    if (!validate()) return;
     setSubmitting(true);
     try {
       const clienteId = await getOrCreateCliente();
@@ -84,12 +96,12 @@ export default function CartPage() {
         precio_unitario: i.precio_unitario,
         subtotal: i.precio_unitario * i.cantidad,
       }));
-      await supabase.from("venta_items").insert(ventaItems);
+      const { error: itemsErr } = await supabase.from("venta_items").insert(ventaItems);
+      if (itemsErr) throw itemsErr;
       clear();
-      toast.success("¡Compra confirmada!");
-      navigate("/");
+      navigate(`/confirmado/compra/${venta.id}`);
     } catch (e: any) {
-      toast.error(e.message || "Error al procesar compra");
+      toast.error("Error al procesar la compra. Intentá de nuevo.");
     } finally {
       setSubmitting(false);
     }
@@ -130,63 +142,6 @@ export default function CartPage() {
       setSubmitting(false);
     }
   };
-
-  if (cotizacionResult) {
-    return (
-      <PublicLayout>
-        <div className="container max-w-2xl py-12">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Cotización Generada</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-sm text-muted-foreground">
-                <p>Cliente: {cotizacionResult.cliente.nombre} ({cotizacionResult.cliente.email})</p>
-                <p>Estado: <span className="font-medium text-accent">Pendiente</span></p>
-                <p>Fecha: {new Date(cotizacionResult.created_at).toLocaleDateString("es-AR")}</p>
-              </div>
-              <div className="border rounded-md overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted">
-                    <tr>
-                      <th className="text-left p-2">Producto</th>
-                      <th className="text-right p-2">Cant.</th>
-                      <th className="text-right p-2">Precio</th>
-                      <th className="text-right p-2">Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((i) => (
-                      <tr key={i.producto_id} className="border-t">
-                        <td className="p-2">{i.nombre}</td>
-                        <td className="p-2 text-right">{i.cantidad}</td>
-                        <td className="p-2 text-right">{formatARS(i.precio_unitario)}</td>
-                        <td className="p-2 text-right">{formatARS(i.precio_unitario * i.cantidad)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot className="bg-muted font-bold">
-                    <tr>
-                      <td colSpan={3} className="p-2 text-right">Total:</td>
-                      <td className="p-2 text-right">{formatARS(cotizacionResult.total)}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-              <div className="flex gap-3">
-                <Button onClick={() => window.print()} variant="outline" className="flex-1">
-                  Imprimir / Descargar
-                </Button>
-                <Button onClick={handleConfirmFromQuote} disabled={submitting} className="flex-1">
-                  <CreditCard className="mr-2 h-4 w-4" /> Confirmar y Comprar Ahora
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </PublicLayout>
-    );
-  }
 
   return (
     <PublicLayout>
@@ -260,11 +215,13 @@ export default function CartPage() {
                       <h3 className="font-semibold text-sm">{mode === "quote" ? "Datos para Cotización" : "Datos de Compra"}</h3>
                       <div className="space-y-1">
                         <label htmlFor="cart-nombre" className="text-xs font-medium text-muted-foreground">Nombre <span className="text-destructive">*</span></label>
-                        <Input id="cart-nombre" placeholder="Juan García" autoComplete="name" value={form.nombre} onChange={(e) => handleField("nombre", e.target.value)} />
+                        <Input id="cart-nombre" placeholder="Juan García" autoComplete="name" value={form.nombre} onChange={(e) => { handleField("nombre", e.target.value); setErrors((p) => ({ ...p, nombre: "" })); }} className={errors.nombre ? "border-destructive focus-visible:ring-destructive" : ""} />
+                        {errors.nombre && <p className="text-xs text-destructive">{errors.nombre}</p>}
                       </div>
                       <div className="space-y-1">
                         <label htmlFor="cart-email" className="text-xs font-medium text-muted-foreground">Email <span className="text-destructive">*</span></label>
-                        <Input id="cart-email" placeholder="juan@empresa.com" type="email" autoComplete="email" value={form.email} onChange={(e) => handleField("email", e.target.value)} />
+                        <Input id="cart-email" placeholder="juan@empresa.com" type="email" autoComplete="email" value={form.email} onChange={(e) => { handleField("email", e.target.value); setErrors((p) => ({ ...p, email: "" })); }} className={errors.email ? "border-destructive focus-visible:ring-destructive" : ""} />
+                        {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
                       </div>
                       <div className="space-y-1">
                         <label htmlFor="cart-telefono" className="text-xs font-medium text-muted-foreground">Teléfono</label>

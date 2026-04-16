@@ -74,8 +74,7 @@ export default function SearchQuotePage() {
       }));
       await supabase.from("venta_items").insert(ventaItems);
       await supabase.from("cotizaciones").update({ estado: "convertida" }).eq("id", selected.id);
-      toast.success("¡Compra confirmada exitosamente!");
-      navigate("/");
+      navigate(`/confirmado/compra/${venta.id}`);
     } catch (e: any) {
       toast.error(e.message || "Error al confirmar compra");
     } finally {

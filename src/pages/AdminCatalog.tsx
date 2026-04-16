@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -20,6 +20,8 @@ export default function AdminCatalog() {
   const [proveedores, setProveedores] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 20;
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const debouncedSearch = useDebounce(search);
@@ -43,7 +45,7 @@ export default function AdminCatalog() {
     supabase.from("proveedores").select("id, nombre").then(({ data }) => setProveedores(data || []));
   }, []);
 
-  useEffect(() => { loadProducts(); }, [debouncedSearch]);
+  useEffect(() => { setPage(0); loadProducts(); }, [debouncedSearch]);
 
   const openEdit = (p: any) => {
     setEditing(p);
@@ -84,13 +86,19 @@ export default function AdminCatalog() {
 
   const handleField = (f: string, v: any) => setForm((p) => ({ ...p, [f]: v }));
 
+  const paginatedProductos = productos.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const totalPages = Math.ceil(productos.length / PAGE_SIZE);
+
   return (
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Gestión de Catálogo</h1>
         <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> Nuevo Producto</Button>
       </div>
-      <Input placeholder="Buscar producto..." value={search} onChange={(e) => setSearch(e.target.value)} className="mb-4 max-w-md" />
+      <div className="flex items-center gap-3 mb-4">
+        <Input placeholder="Buscar producto..." value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-md" />
+        {!loading && <p className="text-sm text-muted-foreground whitespace-nowrap">{productos.length} producto{productos.length !== 1 ? "s" : ""}</p>}
+      </div>
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -112,7 +120,7 @@ export default function AdminCatalog() {
                 <TableRow><TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Cargando...</TableCell></TableRow>
               ) : productos.length === 0 ? (
                 <TableRow><TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Sin productos</TableCell></TableRow>
-              ) : productos.map((p) => (
+              ) : paginatedProductos.map((p) => (
                 <TableRow key={p.producto_id}>
                   <TableCell>
                     {p.imagen_url ? (
@@ -147,6 +155,22 @@ export default function AdminCatalog() {
           </Table>
         </CardContent>
       </Card>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-sm text-muted-foreground">
+            Página {page + 1} de {totalPages}
+          </p>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
+              <ChevronLeft className="h-4 w-4 mr-1" /> Anterior
+            </Button>
+            <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>
+              Siguiente <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg">
