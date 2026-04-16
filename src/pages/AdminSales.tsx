@@ -5,6 +5,7 @@ import { AdminLayout } from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function AdminSales() {
@@ -50,7 +51,7 @@ export default function AdminSales() {
       .from("cotizacion_items")
       .select("*, productos(nombre, sku_norm)")
       .eq("cotizacion_id", v.cotizacion_id);
-    if (error) console.error("Error cargando items:", error);
+    if (error) toast.error("No se pudieron cargar los items de la venta");
     setItems(data || []);
   };
 

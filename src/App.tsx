@@ -14,6 +14,7 @@ import AdminQuotes from "./pages/AdminQuotes";
 import AdminSales from "./pages/AdminSales";
 import NotFound from "./pages/NotFound";
 import OrderConfirmedPage from "./pages/OrderConfirmedPage";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -29,11 +30,11 @@ const App = () => (
           <Route path="/buscar-cotizacion" element={<SearchQuotePage />} />
           <Route path="/confirmado/:type/:id" element={<OrderConfirmedPage />} />
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/catalogo" element={<AdminCatalog />} />
-          <Route path="/admin/historial-precios" element={<AdminPriceHistory />} />
-          <Route path="/admin/cotizaciones" element={<AdminQuotes />} />
-          <Route path="/admin/ventas" element={<AdminSales />} />
+          <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/catalogo" element={<ProtectedRoute><AdminCatalog /></ProtectedRoute>} />
+          <Route path="/admin/historial-precios" element={<ProtectedRoute><AdminPriceHistory /></ProtectedRoute>} />
+          <Route path="/admin/cotizaciones" element={<ProtectedRoute><AdminQuotes /></ProtectedRoute>} />
+          <Route path="/admin/ventas" element={<ProtectedRoute><AdminSales /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

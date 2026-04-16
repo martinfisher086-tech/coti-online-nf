@@ -41,7 +41,8 @@ export default function CatalogPage() {
     setLoading(true);
     let query = supabase.from("vw_catalogo_vigente_img").select("*");
     if (debouncedSearch) {
-      query = query.or(`producto.ilike.%${debouncedSearch}%,sku_norm.ilike.%${debouncedSearch}%`);
+      const term = debouncedSearch.replace(/[%_]/g, "\\$&");
+      query = query.or(`producto.ilike.%${term}%,sku_norm.ilike.%${term}%`);
     }
     if (catFilter !== "all") query = query.eq("categoria", catFilter);
     
@@ -50,10 +51,8 @@ export default function CatalogPage() {
     else query = query.order("producto");
 
     query.then(({ data, error }) => {
-      console.log("CATALOGO DATA:", data);
-      console.log("CATALOGO ERROR:", error);
       if (error) {
-        toast.error(`Error cargando catálogo: ${error.message}`);
+        toast.error("Error al cargar el catálogo. Intentá de nuevo.");
         setProductos([]);
         setLoading(false);
         return;

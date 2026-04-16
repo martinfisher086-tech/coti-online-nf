@@ -33,9 +33,12 @@ export default function AdminCatalog() {
   const loadProducts = async () => {
     setLoading(true);
     let q = supabase.from("vw_catalogo_vigente_img").select("*").order("producto");
-    if (debouncedSearch) q = q.or(`producto.ilike.%${debouncedSearch}%,sku_norm.ilike.%${debouncedSearch}%`);
+    if (debouncedSearch) {
+      const term = debouncedSearch.replace(/[%_]/g, "\\$&");
+      q = q.or(`producto.ilike.%${term}%,sku_norm.ilike.%${term}%`);
+    }
     const { data, error } = await q;
-    if (error) toast.error(`Error cargando productos: ${error.message}`);
+    if (error) toast.error("Error al cargar los productos. Intentá de nuevo.");
     setProductos(data || []);
     setLoading(false);
   };
@@ -73,11 +76,11 @@ export default function AdminCatalog() {
     };
     if (editing) {
       const { error } = await supabase.from("productos").update(payload).eq("id", editing.producto_id);
-      if (error) return toast.error(error.message);
+      if (error) return toast.error("No se pudo actualizar el producto. Revisá los datos e intentá de nuevo.");
       toast.success("Producto actualizado");
     } else {
       const { error } = await supabase.from("productos").insert(payload);
-      if (error) return toast.error(error.message);
+      if (error) return toast.error("No se pudo crear el producto. Revisá los datos e intentá de nuevo.");
       toast.success("Producto creado");
     }
     setDialogOpen(false);
