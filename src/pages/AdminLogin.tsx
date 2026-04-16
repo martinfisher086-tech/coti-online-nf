@@ -33,8 +33,14 @@ export default function AdminLogin() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
-            <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <Input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <div className="space-y-1.5">
+              <label htmlFor="admin-email" className="text-sm font-medium">Email</label>
+              <Input id="admin-email" type="email" placeholder="admin@ejemplo.com" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </div>
+            <div className="space-y-1.5">
+              <label htmlFor="admin-password" className="text-sm font-medium">Contraseña</label>
+              <Input id="admin-password" type="password" placeholder="••••••••" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Ingresando..." : "Ingresar"}
             </Button>

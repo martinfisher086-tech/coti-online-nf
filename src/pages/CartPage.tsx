@@ -219,16 +219,16 @@ export default function CartPage() {
                       <p className="text-sm font-semibold mt-1">{formatARS(item.precio_unitario)}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateQty(item.producto_id, item.cantidad - 1)}>
+                      <Button size="icon" variant="outline" className="h-8 w-8" aria-label={`Reducir cantidad de ${item.nombre}`} onClick={() => updateQty(item.producto_id, item.cantidad - 1)}>
                         <Minus className="h-3 w-3" />
                       </Button>
-                      <span className="w-8 text-center text-sm">{item.cantidad}</span>
-                      <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateQty(item.producto_id, item.cantidad + 1)}>
+                      <span className="w-8 text-center text-sm" aria-label={`Cantidad: ${item.cantidad}`}>{item.cantidad}</span>
+                      <Button size="icon" variant="outline" className="h-8 w-8" aria-label={`Aumentar cantidad de ${item.nombre}`} onClick={() => updateQty(item.producto_id, item.cantidad + 1)}>
                         <Plus className="h-3 w-3" />
                       </Button>
                     </div>
                     <p className="font-semibold text-sm w-24 text-right">{formatARS(item.precio_unitario * item.cantidad)}</p>
-                    <Button size="icon" variant="ghost" onClick={() => removeItem(item.producto_id)}>
+                    <Button size="icon" variant="ghost" aria-label={`Eliminar ${item.nombre} del carrito`} onClick={() => removeItem(item.producto_id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </CardContent>
@@ -258,10 +258,22 @@ export default function CartPage() {
                   {(mode === "quote" || mode === "buy") && (
                     <div className="space-y-3">
                       <h3 className="font-semibold text-sm">{mode === "quote" ? "Datos para Cotización" : "Datos de Compra"}</h3>
-                      <Input placeholder="Nombre *" value={form.nombre} onChange={(e) => handleField("nombre", e.target.value)} />
-                      <Input placeholder="Email *" type="email" value={form.email} onChange={(e) => handleField("email", e.target.value)} />
-                      <Input placeholder="Teléfono" value={form.telefono} onChange={(e) => handleField("telefono", e.target.value)} />
-                      <Input placeholder="Dirección" value={form.direccion} onChange={(e) => handleField("direccion", e.target.value)} />
+                      <div className="space-y-1">
+                        <label htmlFor="cart-nombre" className="text-xs font-medium text-muted-foreground">Nombre <span className="text-destructive">*</span></label>
+                        <Input id="cart-nombre" placeholder="Juan García" autoComplete="name" value={form.nombre} onChange={(e) => handleField("nombre", e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label htmlFor="cart-email" className="text-xs font-medium text-muted-foreground">Email <span className="text-destructive">*</span></label>
+                        <Input id="cart-email" placeholder="juan@empresa.com" type="email" autoComplete="email" value={form.email} onChange={(e) => handleField("email", e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label htmlFor="cart-telefono" className="text-xs font-medium text-muted-foreground">Teléfono</label>
+                        <Input id="cart-telefono" placeholder="+54 11 1234-5678" autoComplete="tel" value={form.telefono} onChange={(e) => handleField("telefono", e.target.value)} />
+                      </div>
+                      <div className="space-y-1">
+                        <label htmlFor="cart-direccion" className="text-xs font-medium text-muted-foreground">Dirección de entrega</label>
+                        <Input id="cart-direccion" placeholder="Av. Corrientes 1234, CABA" autoComplete="street-address" value={form.direccion} onChange={(e) => handleField("direccion", e.target.value)} />
+                      </div>
                       {mode === "buy" && (
                         <Select value={medioPago} onValueChange={setMedioPago}>
                           <SelectTrigger><SelectValue /></SelectTrigger>

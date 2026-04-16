@@ -20,18 +20,17 @@ export function PublicHeader() {
             Mis Cotizaciones
           </Link>
           <Link to="/carrito" className="relative">
-            <Button variant="secondary" size="icon" className="relative">
+            <Button variant="secondary" size="icon" className="relative" aria-label="Ver carrito de compras">
               <ShoppingCart className="h-5 w-5" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
+                <span
+                  className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground animate-in zoom-in-50 duration-200"
+                  aria-live="polite"
+                  aria-label={`${itemCount} producto${itemCount !== 1 ? "s" : ""} en el carrito`}
+                >
                   {itemCount}
                 </span>
               )}
-            </Button>
-          </Link>
-          <Link to="/admin/login">
-            <Button variant="ghost" size="sm" className="text-primary-foreground/60 hover:text-primary-foreground hover:bg-primary/80 text-xs">
-              Admin
             </Button>
           </Link>
         </nav>

@@ -135,7 +135,7 @@ export default function CatalogPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {productos.map((p) => {
               return (
-                <Card key={p.producto_id} className="rounded-2xl shadow-md hover:shadow-lg transition-all overflow-hidden" style={{ border: '1px solid rgba(45, 74, 62, 0.2)' }}>
+                <Card key={p.producto_id} className="rounded-2xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-primary/20">
                   {/* Product image */}
                   {p.imagen_url ? (
                     <img
@@ -173,25 +173,27 @@ export default function CatalogPage() {
                             <Badge variant="destructive" className="text-[9px] ml-2 align-middle">Bajo</Badge>
                           )}
                         </p>
-                        <p className="text-2xl font-bold tracking-tight" style={{ color: '#4A7C59' }}>{formatARS(p.precio_venta)}</p>
+                        <p className="text-2xl font-bold tracking-tight text-primary">{formatARS(p.precio_venta)}</p>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center rounded-lg" style={{ border: '1px solid rgba(45,74,62,0.2)' }}>
+                        <div className="flex items-center rounded-lg border border-primary/20">
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 rounded-l-lg rounded-r-none"
+                            aria-label={`Reducir cantidad de ${p.producto}`}
                             disabled={getQty(p.producto_id) <= 1}
                             onClick={() => setQty(p.producto_id, getQty(p.producto_id) - 1, p.stock)}
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
-                          <span className="w-8 text-center text-sm font-medium">{getQty(p.producto_id)}</span>
+                          <span className="w-8 text-center text-sm font-medium" aria-label={`Cantidad seleccionada: ${getQty(p.producto_id)}`}>{getQty(p.producto_id)}</span>
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 rounded-r-lg rounded-l-none"
+                            aria-label={`Aumentar cantidad de ${p.producto}`}
                             disabled={getQty(p.producto_id) >= p.stock}
                             onClick={() => setQty(p.producto_id, getQty(p.producto_id) + 1, p.stock)}
                           >
